@@ -1,0 +1,49 @@
+{
+  "name": "iamfredric/edu-admin",
+  "description": "Laravel api client for EduAdmin",
+  "keywords": [
+    "open-graph"
+  ],
+  "license": "MIT",
+  "authors": [{
+    "name": "Fredric",
+    "role": "Developer"
+  }],
+  "require": {
+    "php": "^8.1|^8.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^7.5",
+    "pestphp/pest": "^1.21",
+    "phpstan/phpstan": "^1.4",
+    "squizlabs/php_codesniffer": "^3.6"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Iamfredric\\EduAdmin\\EduAdminServiceProvider"
+      ]
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Iamfredric\\EduAdmin\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Iamfredric\\EduAdmin\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest",
+    "analyze": "vendor/bin/phpstan analyse",
+    "sniff": "vendor/bin/phpcs --standard=PSR2 --encoding=utf-8 -p --colors ./src",
+    "fix": "vendor/bin/phpcbf --standard=PSR2 --encoding=utf-8 -p --colors ./src"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
