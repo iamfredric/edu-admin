@@ -2,6 +2,8 @@
 
 namespace Iamfredric\EduAdmin\Resources;
 
+use Illuminate\Support\Collection;
+
 /**
  * @property int $PersonId
  * @property int $CustomerId
@@ -28,11 +30,22 @@ namespace Iamfredric\EduAdmin\Resources;
  * @property string|null $PurchaseOrderNumber
  * @property string|null $Reference
  * @property int $IndividualId
- * @property array|null $CustomFields
+ * @property Collection<int, CustomField>|null $CustomFields
  * @property array|null $Certificates
  * @property array|null $ExternalCertificates
  * @property array|null $Consents
  */
-class Person extends Resource
+class Person extends WritableResource
 {
+    /**
+     * @var array|class-string[]
+     */
+    protected array $casts = [
+        'CustomFields.*' => CustomField::class
+    ];
+
+    protected static function resourceName(): string
+    {
+        return 'Persons';
+    }
 }

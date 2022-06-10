@@ -2,6 +2,8 @@
 
 namespace Iamfredric\EduAdmin\Resources;
 
+use Carbon\Carbon;
+
 /**
  * @property int $CustomerId
  * @property string|null $CustomerName
@@ -23,9 +25,13 @@ namespace Iamfredric\EduAdmin\Resources;
  * @property string|null $CustomerGroupName
  * @property boolean|null $NonCreditworthy
  * @property array|null $BillingInfo
- * @property array|null $CustomFields
+ * @property Illuminate\Support\Collection<int, CustomField>|null $CustomFields
  */
-class Customer extends Resource
+class Customer extends WritableResource
 {
-
+    protected array $casts = [
+        'Created' => Carbon::class,
+        'Modified' => Carbon::class,
+        'CustomFields.*' => CustomField::class
+    ];
 }

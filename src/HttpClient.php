@@ -29,6 +29,13 @@ class HttpClient implements HttpClientContract
      */
     public function post(string $url, array $params = [], array $headers = []): Collection
     {
+        if ($headers['content-type'] ?? null == 'application/x-www-form-urlencoded') {
+            return Http::asForm()
+                ->withHeaders($headers)
+                ->post($url, $params)
+                ->collect();
+        }
+
         return Http::withHeaders($headers)
             ->post($url, $params)
             ->collect();

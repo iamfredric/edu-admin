@@ -2,6 +2,7 @@
 
 namespace Iamfredric\EduAdmin;
 
+use Iamfredric\EduAdmin\Resources\Resource;
 use Illuminate\Support\Collection;
 
 class Builder
@@ -30,6 +31,10 @@ class Builder
      */
     protected array $relations = [];
 
+    /**
+     * @param string $uri
+     * @param class-string<Resource>|null $resource
+     */
     public function __construct(
         protected string $uri,
         protected ?string $resource = null
@@ -51,6 +56,9 @@ class Builder
 
         if (is_string($value)) {
             $value = "'{$value}'";
+        } elseif (is_bool($value)) {
+            /** @phpstan-ignore-next-line */
+            $value = boolval($value) === true ? 'true' : 'false';
         }
 
         $this->where[] = "{$field} {$compare} {$value}";
@@ -101,11 +109,23 @@ class Builder
             ->get($this->uri, $this->getParams());
 
         if ($this->resource) {
-            // @phpstan-ignore-next-line
             return (new Collection($response->get('value')))->mapInto($this->resource);
         }
 
         return $response;
+    }
+
+    public function find(int $id): ?Resource
+    {
+        $this->uri = implode('/', [$this->uri, $id]);
+
+        $response = (new Client())->get($this->uri, $this->getParams());
+
+        if ($response->count() && $this->resource) {
+            return new $this->resource($response);
+        }
+
+        return null;
     }
 
     public function getParams(?string $param = null): mixed

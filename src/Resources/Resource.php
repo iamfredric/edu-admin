@@ -6,61 +6,15 @@ use Iamfredric\EduAdmin\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-abstract class Resource
+/**
+ * @method static Builder where(string|callable $field, ?string $compare = null, mixed $value = null): static
+ * @method static Builder orWhere(string|callable $field, ?string $compare = null, mixed $value = null): static
+ * @method static Builder with(...$relations): static
+ * @method static Builder getParams(?string $param = null): mixed
+ */
+abstract class Resource extends Model
 {
-    protected Collection $attributes;
-
-    /**
-     * @param Collection<string,mixed>|array<string,mixed> $attributes
-     */
-    final public function __construct(array|Collection $attributes)
-    {
-        $this->attributes = $attributes instanceof Collection ? $attributes : new Collection($attributes);
-    }
-
-    /**
-     * @param array<string,mixed> $arguments
-     *
-     * @return $this
-     */
-    public function update(array $arguments): static
-    {
-        (new Builder("odata/".static::resourceName()."/{$this->getKey()}"))
-            ->put($arguments);
-
-        return $this;
-    }
-
-    public function save(): static
-    {
-        return $this->update($this->toArray());
-    }
-
-    /**
-     * @param mixed $id
-     * @param array<string,mixed> $arguments
-     * @return Collection
-     */
-    public static function updateWhereId(mixed $id, array $arguments): Collection
-    {
-        return (new Builder("odata/".static::resourceName()."/{$id}"))
-            ->put($arguments);
-    }
-
-    public function getKey(): mixed
-    {
-        return $this->attributes->get($this->getKeyName());
-    }
-
-    public function getKeyName(): string
-    {
-        $parts = explode('\\', static::class);
-        $className = end($parts);
-
-        return "{$className}Id";
-    }
-
-    public static function find(int $id): static
+    public static function find(int $id): self
     {
         return new static(
             (new Builder("odata/".static::resourceName()."/{$id}"))
@@ -100,33 +54,5 @@ abstract class Resource
     public static function __callStatic(string $name, array $arguments): Builder
     {
         return static::query()->{$name}(...$arguments);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
-    {
-        return $this->attributes->toArray();
-    }
-
-    public function getAttribute(string $name, mixed $default = null): mixed
-    {
-        return $this->attributes->get($name, $default);
-    }
-
-    public function setAttribute(string $name, mixed $value): void
-    {
-        $this->attributes->put($name, $value);
-    }
-
-    public function __get(string $name): mixed
-    {
-        return $this->getAttribute($name);
-    }
-
-    public function __set(string $name, mixed $value): void
-    {
-        $this->setAttribute($name, $value);
     }
 }
