@@ -2,9 +2,10 @@
 
 namespace Iamfredric\EduAdmin\Resources;
 
+use ArrayAccess;
 use Illuminate\Support\Collection;
 
-abstract class Model
+abstract class Model implements ArrayAccess
 {
     protected Collection $attributes;
 
@@ -74,5 +75,25 @@ abstract class Model
     public function __set(string $name, mixed $value): void
     {
         $this->setAttribute($name, $value);
+    }
+
+    public function offsetExists($offset): bool
+    {
+        return $this->attributes->has($offset);
+    }
+
+    public function offsetGet($offset): mixed
+    {
+        return $this->getAttribute($offset);
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        $this->setAttribute($offset, $value);
+    }
+
+    public function offsetUnset($offset): void
+    {
+        $this->attributes->offsetUnset($offset);
     }
 }

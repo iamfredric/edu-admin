@@ -20,8 +20,8 @@ use Iamfredric\EduAdmin\Resources\Models\EventDate;
  * @property-read int|null $LocationId
  * @property-read int|null $LocationAddressId
  * @property-read string|null $City
- * @property-read string $StartDate
- * @property-read string $EndDate
+ * @property-read Carbon $StartDate
+ * @property-read Carbon $EndDate
  * @property-read int|null $MinParticipantNumber
  * @property-read int|null $MaxParticipantNumber
  * @property-read int $NumberOfBookedParticipants

@@ -23,7 +23,8 @@ class Builder
         '>' => 'Gt',
         '>=' => 'Ge',
         '<' => 'Lt',
-        '<=' => 'Le'
+        '<=' => 'Le',
+        'IN' => 'in'
     ];
 
     /**
@@ -54,7 +55,9 @@ class Builder
 
         $compare = $this->compareTranslations[$compare] ?? $compare;
 
-        if (is_string($value)) {
+        if (is_array($value)) {
+            $value = '('.implode(',', $value).')';
+        } elseif (is_string($value)) {
             $value = "'{$value}'";
         } elseif (is_bool($value)) {
             /** @phpstan-ignore-next-line */
