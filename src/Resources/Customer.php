@@ -25,7 +25,7 @@ use Carbon\Carbon;
  * @property string|null $CustomerGroupName
  * @property boolean|null $NonCreditworthy
  * @property array|null $BillingInfo
- * @property Illuminate\Support\Collection<int, CustomField>|null $CustomFields
+ * @property \Illuminate\Support\Collection<int, CustomField>|null $CustomFields
  */
 class Customer extends WritableResource
 {

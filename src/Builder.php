@@ -12,6 +12,14 @@ class Builder
      */
     protected array $where = [];
 
+    protected ?int $limit = null;
+
+    protected ?int $skip = null;
+
+    protected ?string $orderBy = null;
+
+    protected string $order = 'asc';
+
     protected string $compare = 'AND';
 
     /**
@@ -40,6 +48,15 @@ class Builder
         protected string $uri,
         protected ?string $resource = null
     ) {
+    }
+
+    public function when(mixed $statement, callable $callable): static
+    {
+        if ($statement) {
+            $callable($this, $statement);
+        }
+
+        return $this;
     }
 
     public function where(string|callable $field, ?string $compare = null, mixed $value = null): static
@@ -85,6 +102,28 @@ class Builder
         return $this->where($field, $compare, $value);
     }
 
+    public function limit(int $limit): static
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    public function skip(int $skip): static
+    {
+        $this->skip = $skip;
+
+        return $this;
+    }
+
+    public function orderBy(string $orderBy, string $order = 'asc'): static
+    {
+        $this->orderBy = $orderBy;
+        $this->order = $order;
+
+        return $this;
+    }
+
     /**
      * @param string ...$relations
      * @return $this
@@ -106,16 +145,30 @@ class Builder
             ->put($this->uri, $attributes);
     }
 
-    public function get(): Collection
+    public function get(): ResourceCollection|Collection
     {
         $response = (new Client())
             ->get($this->uri, $this->getParams());
 
         if ($this->resource) {
-            return (new Collection($response->get('value')))->mapInto($this->resource);
+            return new ResourceCollection(
+                $response->get('value'),
+                $response->get('@odata.count') ?: 0,
+                $this->limit ?: 100000,
+                $this->skip ?: 0,
+                $this->orderBy,
+                $this->order,
+                $this->resource
+            );
         }
 
         return $response;
+    }
+
+    public function first(): Collection
+    {
+        return (new Client())
+            ->get($this->uri, $this->getParams());
     }
 
     public function find(int $id): ?Resource
@@ -135,8 +188,22 @@ class Builder
     {
         $attributes = [];
 
+        $attributes['$count'] = 'true';
+
         if (count($this->where)) {
             $attributes['$filter'] = implode(" {$this->compare} ", $this->where);
+        }
+
+        if ($this->limit) {
+            $attributes['$top'] = $this->limit;
+        }
+
+        if ($this->skip) {
+            $attributes['$skip'] = $this->skip;
+        }
+
+        if ($this->orderBy) {
+            $attributes['$orderBy'] = "{$this->orderBy} {$this->order}";
         }
 
         if (count($this->relations)) {

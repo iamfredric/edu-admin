@@ -3,6 +3,7 @@
 namespace Iamfredric\EduAdmin\Resources;
 
 use Iamfredric\EduAdmin\Builder;
+use Iamfredric\EduAdmin\ResourceCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -11,6 +12,9 @@ use Illuminate\Support\Str;
  * @method static Builder orWhere(string|callable $field, ?string $compare = null, mixed $value = null): static
  * @method static Builder with(...$relations): static
  * @method static Builder getParams(?string $param = null): mixed
+ * @method static Builder limit(int $limit): static
+ * @method static Builder skip(int $skip): static
+ * @method static Builder orderBy(string $orderBy, string $order = 'asc'): static
  */
 abstract class Resource extends Model
 {
@@ -18,7 +22,7 @@ abstract class Resource extends Model
     {
         return new static(
             (new Builder("odata/".static::resourceName()."/{$id}"))
-                ->get()
+                ->first()
         );
     }
 
@@ -30,7 +34,7 @@ abstract class Resource extends Model
         );
     }
 
-    public static function all(): Collection
+    public static function all(): ResourceCollection|Collection
     {
         return (new Builder(
             'odata/'.static::resourceName(),

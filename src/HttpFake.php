@@ -113,12 +113,23 @@ class HttpFake implements HttpClient
         return new Collection($this->record[$this->trimUri($url)] ?? []);
     }
 
-    public function assertCalled(string $url): static
+    /**
+     * @param string $url
+     * @param array<string, mixed> $params
+     * @return $this
+     */
+    public function assertCalled(string $url, array $params = []): static
     {
         PHPUnit::assertTrue(
             $this->recorded($url)->count() > 0,
             "The request to {$url} was not recorded, endpoints recorded: ".implode(', ', array_keys($this->record))
         );
+
+        if (count($params)) {
+            foreach ($params as $name => $param) {
+                PHPUnit::assertEquals($param, $this->recorded($url)[0][$name]);
+            }
+        }
 
         return $this;
     }

@@ -11,6 +11,7 @@ it('can add where clauses', function () {
     $builder->where('thing', 'thing');
     expect($builder->getParams())
         ->toBe([
+            '$count' => 'true',
             '$filter' => "thing Eq 'thing'"
         ]);
 });
@@ -22,6 +23,7 @@ it('can add multiple where clauses', function () {
 
     expect($builder->getParams())
         ->toBe([
+            '$count' => 'true',
             '$filter' => "thing Eq 'thing' AND another Ne 'thing'"
         ]);
 });
@@ -35,6 +37,7 @@ it('can group where where clauses', function () {
 
     expect($builder->getParams())
         ->toBe([
+            '$count' => 'true',
             '$filter' => "(item Gt 4 OR item Lt 6) AND id Eq 'five'"
         ]);
 });
@@ -45,6 +48,7 @@ it('can load related data', function () {
 
     expect($builder->getParams())
         ->toBe([
+            '$count' => 'true',
             '$expand' => 'CustomFields,OtherFields'
         ]);
 });
@@ -71,4 +75,17 @@ test('it can call put', function () {
 
     $http->assertCalled('https://api.eduadmin.se/token');
     $http->assertCalled('https://api.eduadmin.se/v1/test');
+});
+
+it('can add conditional tags', function () {
+    $builder = new Builder('test');
+    $builder->when('thing', fn (Builder $query, $thing) => $query->where('thing', $thing));
+
+    $builder->when('', fn (Builder $query, $thing) => $query->where('other-thing', $thing));
+
+    expect($builder->getParams())
+        ->toBe([
+            '$count' => 'true',
+            '$filter' => "thing Eq 'thing'"
+        ]);
 });
