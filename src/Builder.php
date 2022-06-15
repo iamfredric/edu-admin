@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 class Builder
 {
     /**
-     * @var array<int,string>
+     * @var array<int|string,string>
      */
     protected array $where = [];
 
@@ -21,6 +21,11 @@ class Builder
     protected string $order = 'asc';
 
     protected string $compare = 'AND';
+
+    /**
+     * @var array<int|string,mixed>
+     */
+    protected array $select = [];
 
     /**
      * @var array<string, string>
@@ -48,6 +53,13 @@ class Builder
         protected string $uri,
         protected ?string $resource = null
     ) {
+    }
+
+    public function select(string ...$fields): static
+    {
+        $this->select = $fields;
+
+        return $this;
     }
 
     public function when(mixed $statement, callable $callable): static
@@ -145,8 +157,16 @@ class Builder
             ->put($this->uri, $attributes);
     }
 
-    public function get(): ResourceCollection|Collection
+    /**
+     * @param array<int|string, string> $fields
+     * @return ResourceCollection|Collection
+     */
+    public function get(array $fields = []): ResourceCollection|Collection
     {
+        if (count($fields)) {
+            $this->select(...$fields);
+        }
+
         $response = (new Client())
             ->get($this->uri, $this->getParams());
 
@@ -189,6 +209,10 @@ class Builder
         $attributes = [];
 
         $attributes['$count'] = 'true';
+
+        if (count($this->select)) {
+            $attributes['$select'] = implode(',', $this->select);
+        }
 
         if (count($this->where)) {
             $attributes['$filter'] = implode(" {$this->compare} ", $this->where);

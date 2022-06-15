@@ -90,4 +90,17 @@ class ResourceCollection implements \IteratorAggregate, \ArrayAccess
     {
         $this->resources->offsetUnset($offset);
     }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function toArray(): array
+    {
+        return $this->resources->map(fn (Resource $resource) => $resource->toArray())->toArray();
+    }
+
+    public function collect(): Collection
+    {
+        return $this->resources;
+    }
 }

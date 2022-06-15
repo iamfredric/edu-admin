@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
  * @property int $PersonId
  * @property int $CustomerId
  * @property string|null $FirstName
+ * @property string|null $LastName
  * @property string|null $Address
  * @property string|null $Address2
  * @property string|null $Zip

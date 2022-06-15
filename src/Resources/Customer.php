@@ -21,6 +21,8 @@ use Carbon\Carbon;
  * @property string|null $Notes
  * @property string|null $Web
  * @property string|null $GLN
+ * @property Carbon $Created
+ * @property Carbon $Modified
  * @property integer|null $CustomerGroupId
  * @property string|null $CustomerGroupName
  * @property boolean|null $NonCreditworthy

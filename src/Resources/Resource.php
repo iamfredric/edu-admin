@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
  * @method static Builder limit(int $limit): static
  * @method static Builder skip(int $skip): static
  * @method static Builder orderBy(string $orderBy, string $order = 'asc'): static
+ * @method static Builder select(...$fields): static
  */
 abstract class Resource extends Model
 {
