@@ -111,5 +111,13 @@ it('can build with query from dot notations', function () {
 
     expect($builder->getParams()['$expand'])
         ->toBe('ProgrammeStarts');
+});
 
+it('can build where clause on dates', function () {
+    $builder = new Builder('test');
+
+    $builder->whereDate('DateField', '=', $now = now());
+
+    expect($builder->getParams('$filter'))
+        ->toBe("DateField Eq {$now->toISOString()}");
 });

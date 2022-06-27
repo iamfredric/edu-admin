@@ -2,6 +2,7 @@
 
 namespace Iamfredric\EduAdmin;
 
+use Carbon\Carbon;
 use Iamfredric\EduAdmin\Resources\Resource;
 use Illuminate\Support\Collection;
 
@@ -95,6 +96,17 @@ class Builder
             /** @phpstan-ignore-next-line */
             $value = boolval($value) === true ? 'true' : 'false';
         }
+
+        $this->where[] = "{$field} {$compare} {$value}";
+
+        return $this;
+    }
+
+    public function whereDate(string $field, string $compare, Carbon|string $value): static
+    {
+        $value = $value instanceof Carbon ? $value->toISOString() : $value;
+
+        $compare = $this->compareTranslations[$compare] ?? $compare;
 
         $this->where[] = "{$field} {$compare} {$value}";
 
