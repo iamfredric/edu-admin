@@ -89,3 +89,27 @@ it('can add conditional tags', function () {
             '$filter' => "thing Eq 'thing'"
         ]);
 });
+
+it('can build with query from dot notations', function () {
+    $builder = new Builder('test');
+
+    $builder->with('ProgrammeStarts.Bookings.Events');
+
+    expect($builder->getParams()['$expand'])
+        ->toBe('ProgrammeStarts($expand=Bookings($expand=Events))');
+
+    $builder = new Builder('test');
+
+    $builder->with('ProgrammeStarts.Bookings');
+
+    expect($builder->getParams()['$expand'])
+        ->toBe('ProgrammeStarts($expand=Bookings)');
+
+    $builder = new Builder('test');
+
+    $builder->with('ProgrammeStarts');
+
+    expect($builder->getParams()['$expand'])
+        ->toBe('ProgrammeStarts');
+
+});

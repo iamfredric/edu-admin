@@ -89,6 +89,17 @@ class HttpFake implements HttpClient
     }
 
     /**
+     * @param string $url
+     * @param array<string,mixed> $params
+     * @param array<string,mixed> $headers
+     * @return Collection
+     */
+    public function delete(string $url, array $params = [], array $headers = []): Collection
+    {
+        return $this->record('delete', $url, $params, $headers);
+    }
+
+    /**
      * @param string $method
      * @param string $url
      * @param array<string,mixed> $params
@@ -130,6 +141,16 @@ class HttpFake implements HttpClient
                 PHPUnit::assertEquals($param, $this->recorded($url)[0][$name]);
             }
         }
+
+        return $this;
+    }
+
+    public function assertNotCalled(string $url): static
+    {
+        PHPUnit::assertFalse(
+            $this->recorded($url)->count() > 0,
+            "The request to {$url} was recorded, endpoints recorded: ".implode(', ', array_keys($this->record))
+        );
 
         return $this;
     }

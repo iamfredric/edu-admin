@@ -22,33 +22,33 @@ abstract class Resource extends Model
     public static function find(int $id): self
     {
         return new static(
-            (new Builder("odata/".static::resourceName()."/{$id}"))
-                ->first()
+            (new Builder('odata/' . static::resourceName() . "/{$id}"))->first()
         );
     }
 
     public static function query(): Builder
     {
-        return new Builder(
-            "odata/".static::resourceName(),
-            static::class
-        );
+        return new Builder('odata/' . static::resourceName(), static::class);
     }
 
     public static function all(): ResourceCollection|Collection
     {
         return (new Builder(
-            'odata/'.static::resourceName(),
+            'odata/' . static::resourceName(),
             static::class
         ))->get();
     }
 
     protected static function resourceName(): string
     {
-        $parts = explode('\\', static::class);
-        $className = end($parts);
+        return Str::plural(static::singularResourceName());
+    }
 
-        return Str::plural($className);
+    public static function singularResourceName(): string
+    {
+        $parts = explode('\\', static::class);
+
+        return end($parts);
     }
 
     /**

@@ -3,10 +3,8 @@
 namespace Iamfredric\EduAdmin;
 
 use ArrayIterator;
-use Exception;
 use Iamfredric\EduAdmin\Resources\Resource;
 use Illuminate\Support\Collection;
-use Traversable;
 
 class ResourceCollection implements \IteratorAggregate, \ArrayAccess
 {
@@ -102,5 +100,15 @@ class ResourceCollection implements \IteratorAggregate, \ArrayAccess
     public function collect(): Collection
     {
         return $this->resources;
+    }
+
+    /**
+     * @param string $name
+     * @param array<mixed,mixed> $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        return $this->resources->{$name}(...$arguments);
     }
 }

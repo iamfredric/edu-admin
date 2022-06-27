@@ -6,10 +6,8 @@ use Carbon\Carbon;
 use Exception;
 use Iamfredric\EduAdmin\Contracts\HttpClient;
 use Iamfredric\EduAdmin\Exceptions\MissingClientCredentialsException;
-use Iamfredric\EduAdmin\Exceptions\MissingClientException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 
 class Client
 {
@@ -30,8 +28,10 @@ class Client
         }
     }
 
-    public static function setCredentials(string $username, string $password): void
-    {
+    public static function setCredentials(
+        string $username,
+        string $password
+    ): void {
         static::$username = $username;
         static::$password = $password;
     }
@@ -48,12 +48,25 @@ class Client
      */
     public function put(string $uri, array $attributes): Collection
     {
-        return $this->getClient()
-            ->put(
-                "https://api.eduadmin.se/v1/{$uri}",
-                $attributes,
-                ['Authorization' => 'Bearer '.$this->token()]
-            );
+        return $this->getClient()->put(
+            "https://api.eduadmin.se/v1/{$uri}",
+            $attributes,
+            ['Authorization' => 'Bearer ' . $this->token()]
+        );
+    }
+
+    /**
+     * @param string $uri
+     * @param array<string, mixed> $attributes
+     * @return Collection
+     */
+    public function post(string $uri, array $attributes): Collection
+    {
+        return $this->getClient()->post(
+            "https://api.eduadmin.se/v1/{$uri}",
+            $attributes,
+            ['Authorization' => 'Bearer ' . $this->token()]
+        );
     }
 
     /**
@@ -63,8 +76,25 @@ class Client
      */
     public function get(string $uri, array $attributes): Collection
     {
-        return $this->getClient()
-            ->get("https://api.eduadmin.se/v1/{$uri}", $attributes, ['Authorization' => 'Bearer '.$this->token()]);
+        return $this->getClient()->get(
+            "https://api.eduadmin.se/v1/{$uri}",
+            $attributes,
+            ['Authorization' => 'Bearer ' . $this->token()]
+        );
+    }
+
+    /**
+     * @param string $uri
+     * @param array<string, mixed> $attributes
+     * @return Collection
+     */
+    public function delete(string $uri, array $attributes = []): Collection
+    {
+        return $this->getClient()->delete(
+            "https://api.eduadmin.se/v1/{$uri}",
+            $attributes,
+            ['Authorization' => 'Bearer ' . $this->token()]
+        );
     }
 
     protected function token(): ?string
@@ -76,14 +106,15 @@ class Client
     {
         $response = new Collection();
 
-        if (! Cache::has('edu-admin.credentials')) {
+        if (!Cache::has('edu-admin.credentials')) {
             $response = $this->authorize();
 
             Cache::put(
                 'edu-admin.credentials',
                 $response,
-                Carbon::parse($response->get('.issued'))
-                    ->addSeconds($response->get('expires_in'))
+                Carbon::parse($response->get('.issued'))->addSeconds(
+                    $response->get('expires_in')
+                )
             );
         }
 
@@ -92,16 +123,19 @@ class Client
 
     protected function authorize(): Collection
     {
-        $response = $this->getClient()
-            ->post('https://api.eduadmin.se/token', [
+        $response = $this->getClient()->post(
+            'https://api.eduadmin.se/token',
+            [
                 'username' => static::$username,
                 'password' => static::$password,
-                'grant_type' => 'password'
-            ], [
-                'content-type' => 'application/x-www-form-urlencoded'
-            ]);
+                'grant_type' => 'password',
+            ],
+            [
+                'content-type' => 'application/x-www-form-urlencoded',
+            ]
+        );
 
-        if (! $response->has('.issued', 'expires_in', 'access_token')) {
+        if (!$response->has('.issued', 'expires_in', 'access_token')) {
             throw new Exception('Unexpected response from EduAdmin');
         }
 

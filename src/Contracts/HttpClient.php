@@ -37,4 +37,12 @@ interface HttpClient
      * @return Collection
      */
     public function patch(string $url, array $params = [], array $headers = []): Collection;
+
+    /**
+     * @param string $url
+     * @param array<string,mixed> $params
+     * @param array<string,mixed> $headers
+     * @return Collection
+     */
+    public function delete(string $url, array $params = [], array $headers = []): Collection;
 }

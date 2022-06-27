@@ -42,7 +42,7 @@ class Person extends WritableResource
      * @var array|class-string[]
      */
     protected array $casts = [
-        'CustomFields.*' => CustomField::class
+        'CustomFields.*' => CustomField::class,
     ];
 
     protected static function resourceName(): string

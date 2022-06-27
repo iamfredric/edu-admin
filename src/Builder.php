@@ -37,7 +37,7 @@ class Builder
         '>=' => 'Ge',
         '<' => 'Lt',
         '<=' => 'Le',
-        'IN' => 'in'
+        'IN' => 'in',
     ];
 
     /**
@@ -71,8 +71,11 @@ class Builder
         return $this;
     }
 
-    public function where(string|callable $field, ?string $compare = null, mixed $value = null): static
-    {
+    public function where(
+        string|callable $field,
+        ?string $compare = null,
+        mixed $value = null
+    ): static {
         if (is_callable($field)) {
             return $this->groupWhere($field);
         }
@@ -85,7 +88,7 @@ class Builder
         $compare = $this->compareTranslations[$compare] ?? $compare;
 
         if (is_array($value)) {
-            $value = '('.implode(',', $value).')';
+            $value = '(' . implode(',', $value) . ')';
         } elseif (is_string($value)) {
             $value = "'{$value}'";
         } elseif (is_bool($value)) {
@@ -102,13 +105,16 @@ class Builder
     {
         $callable($builder = new Builder($this->uri, $this->resource));
 
-        $this->where[] = '('.$builder->getParams('$filter').')';
+        $this->where[] = '(' . $builder->getParams('$filter') . ')';
 
         return $this;
     }
 
-    public function orWhere(string|callable $field, ?string $compare = null, mixed $value = null): static
-    {
+    public function orWhere(
+        string|callable $field,
+        ?string $compare = null,
+        mixed $value = null
+    ): static {
         $this->compare = 'OR';
 
         return $this->where($field, $compare, $value);
@@ -142,6 +148,24 @@ class Builder
      */
     public function with(...$relations): static
     {
+        $relations = array_map(function ($relation) {
+            if (str_contains($relation, '.')) {
+                $value = '';
+
+                foreach (array_reverse(explode('.', $relation)) as $index => $field) {
+                    if ($index === 0) {
+                        $value = $field;
+                    } else {
+                        $value = "{$field}(\$expand={$value})";
+                    }
+                }
+
+                return $value;
+            }
+
+            return $relation;
+        }, $relations);
+
         $this->relations = [...$this->relations, ...$relations];
 
         return $this;
@@ -153,8 +177,16 @@ class Builder
      */
     public function put(array $attributes = []): Collection
     {
-        return (new Client())
-            ->put($this->uri, $attributes);
+        return (new Client())->put($this->uri, $attributes);
+    }
+
+    /**
+     * @param array<string,mixed> $attributes
+     * @return Collection
+     */
+    public function post(array $attributes = []): Collection
+    {
+        return (new Client())->post($this->uri, $attributes);
     }
 
     /**
@@ -167,8 +199,7 @@ class Builder
             $this->select(...$fields);
         }
 
-        $response = (new Client())
-            ->get($this->uri, $this->getParams());
+        $response = (new Client())->get($this->uri, $this->getParams());
 
         if ($this->resource) {
             return new ResourceCollection(
@@ -187,8 +218,7 @@ class Builder
 
     public function first(): Collection
     {
-        return (new Client())
-            ->get($this->uri, $this->getParams());
+        return (new Client())->get($this->uri, $this->getParams());
     }
 
     public function find(int $id): ?Resource
@@ -215,7 +245,10 @@ class Builder
         }
 
         if (count($this->where)) {
-            $attributes['$filter'] = implode(" {$this->compare} ", $this->where);
+            $attributes['$filter'] = implode(
+                " {$this->compare} ",
+                $this->where
+            );
         }
 
         if ($this->limit) {
