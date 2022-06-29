@@ -121,3 +121,21 @@ it('can build where clause on dates', function () {
     expect($builder->getParams('$filter'))
         ->toBe("DateField Eq {$now->toISOString()}");
 });
+
+it('can build where not in', function () {
+    $builder = new Builder('test');
+
+    $builder->where('Thing', 'NOT IN', [1, 2]);
+
+    expect($builder->getParams('$filter'))
+        ->toBe("Thing in (1,2) eq false");
+});
+
+it('can build raw queries', function () {
+    $builder = new Builder('test');
+
+    $builder->whereRaw('Thing eq something');
+
+    expect($builder->getParams('$filter'))
+        ->toBe("Thing eq something");
+});

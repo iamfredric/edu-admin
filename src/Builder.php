@@ -72,6 +72,13 @@ class Builder
         return $this;
     }
 
+    public function whereRaw(string $statement): static
+    {
+        $this->where[] = $statement;
+
+        return $this;
+    }
+
     public function where(
         string|callable $field,
         ?string $compare = null,
@@ -95,6 +102,11 @@ class Builder
         } elseif (is_bool($value)) {
             /** @phpstan-ignore-next-line */
             $value = boolval($value) === true ? 'true' : 'false';
+        }
+
+        if (strtolower($compare ?: '') === 'not in') {
+            $compare = 'in';
+            $value = "{$value} eq false";
         }
 
         $this->where[] = "{$field} {$compare} {$value}";
