@@ -128,7 +128,7 @@ it('can build where not in', function () {
     $builder->where('Thing', 'NOT IN', [1, 2]);
 
     expect($builder->getParams('$filter'))
-        ->toBe("Thing in (1,2) eq false");
+        ->toBe("not(Thing in (1,2))");
 });
 
 it('can build raw queries', function () {

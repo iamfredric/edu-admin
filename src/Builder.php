@@ -88,6 +88,10 @@ class Builder
             return $this->groupWhere($field);
         }
 
+        if (strtolower($compare ?: '') === 'not in') {
+            return $this->whereNotIn($field, $value);
+        }
+
         if (empty($value)) {
             $value = $compare;
             $compare = '=';
@@ -104,12 +108,37 @@ class Builder
             $value = boolval($value) === true ? 'true' : 'false';
         }
 
-        if (strtolower($compare ?: '') === 'not in') {
-            $compare = 'in';
-            $value = "{$value} eq false";
-        }
-
         $this->where[] = "{$field} {$compare} {$value}";
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param mixed[] $values
+     *
+     * @return $this
+     */
+    public function whereNotIn(string $field, array $values): static
+    {
+        $value = implode(',', $values);
+
+        $this->where[] = "not({$field} in ($value))";
+
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param mixed[] $values
+     * 
+     * @return $this
+     */
+    public function whereIn(string $field, array $values): static
+    {
+        $value = implode(',', $values);
+
+        $this->where[] = "{$field} in ($value)";
 
         return $this;
     }
