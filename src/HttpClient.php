@@ -123,7 +123,7 @@ class HttpClient implements HttpClientContract
     protected function sendFailedResponse(Response $response): void
     {
         $data = $response->collect();
-
+        
         match ($response->status()) {
             400 => throw new BadResponseException(
                 $data->get('title', 'Bad request'),

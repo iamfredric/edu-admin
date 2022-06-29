@@ -3,6 +3,7 @@
 namespace Iamfredric\EduAdmin\Resources;
 
 use Carbon\Carbon;
+use Iamfredric\EduAdmin\Builder;
 
 /**
  * @property int $ParticipantId
@@ -60,4 +61,11 @@ class Participant extends Resource
         'CourseTemplate' => CourseTemplate::class,
         'Customer' => Customer::class,
     ];
+
+    public function cancel(): void
+    {
+        (new Builder(
+            static::singularResourceName() . "/{$this->getKey()}/Cancel"
+        ))->post();
+    }
 }

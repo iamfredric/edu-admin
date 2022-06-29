@@ -8,18 +8,18 @@ use Throwable;
 class ResponseException extends Exception
 {
     /**
-     * @param string $message
+     * @param string|null $message
      * @param mixed[]|null $attributes
      * @param int $code
      * @param Throwable|null $previous
      */
     public function __construct(
-        string $message = '',
+        ?string $message = '',
         protected ?array $attributes = [],
         int $code = 0,
         ?Throwable $previous = null
     ) {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message ?: '', $code, $previous);
     }
 
     /**
