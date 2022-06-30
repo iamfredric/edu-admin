@@ -66,6 +66,7 @@ class Event extends Resource
         'StartDate' => Carbon::class,
         'EndDate' => Carbon::class,
         'LastApplicationDate' => Carbon::class,
-        'EventDates.*' => EventDate::class
+        'EventDates.*' => EventDate::class,
+        'Personnel.*' => Personnel::class
     ];
 }

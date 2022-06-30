@@ -131,7 +131,7 @@ class Builder
     /**
      * @param string $field
      * @param mixed[] $values
-     * 
+     *
      * @return $this
      */
     public function whereIn(string $field, array $values): static
