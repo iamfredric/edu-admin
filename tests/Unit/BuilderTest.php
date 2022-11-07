@@ -139,3 +139,16 @@ it('can build raw queries', function () {
     expect($builder->getParams('$filter'))
         ->toBe("Thing eq something");
 });
+
+it('can filter relationship', function () {
+    $builder = new Builder('test');
+
+    $builder->with(function ($query) {
+        $query->whereNull('CustomerId');
+
+        return 'Events';
+    });
+
+    expect($builder->getParams('$expand'))
+        ->toBe("Events(\$filter=CustomerId Eq null)");
+});

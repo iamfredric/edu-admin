@@ -52,7 +52,8 @@ class Builder
      */
     public function __construct(
         protected string $uri,
-        protected ?string $resource = null
+        protected ?string $resource = null,
+        protected bool $withCount = true
     ) {
     }
 
@@ -109,6 +110,20 @@ class Builder
         }
 
         $this->where[] = "{$field} {$compare} {$value}";
+
+        return $this;
+    }
+
+    public function whereNull(string $field): static
+    {
+        $this->where[] = "{$field} Eq null";
+
+        return $this;
+    }
+
+    public function whereNotNull(string $field): static
+    {
+        $this->where[] = "{$field} Ne null";
 
         return $this;
     }
@@ -199,24 +214,30 @@ class Builder
     }
 
     /**
-     * @param string ...$relations
+     * @param string|callable ...$relations
      * @return $this
      */
     public function with(...$relations): static
     {
         $relations = array_map(function ($relation) {
-            if (str_contains($relation, '.')) {
-                $value = '';
+            if (is_callable($relation)) {
+                $e = $relation($builder = new Builder($this->uri, $this->resource, false));
+                
+                $relation = "{$e}({$builder->getQueryString()})";
+            } else {
+                if (str_contains($relation, '.')) {
+                    $value = '';
 
-                foreach (array_reverse(explode('.', $relation)) as $index => $field) {
-                    if ($index === 0) {
-                        $value = $field;
-                    } else {
-                        $value = "{$field}(\$expand={$value})";
+                    foreach (array_reverse(explode('.', $relation)) as $index => $field) {
+                        if ($index === 0) {
+                            $value = $field;
+                        } else {
+                            $value = "{$field}(\$expand={$value})";
+                        }
                     }
-                }
 
-                return $value;
+                    return $value;
+                }
             }
 
             return $relation;
@@ -294,7 +315,10 @@ class Builder
     {
         $attributes = [];
 
-        $attributes['$count'] = 'true';
+        if ($this->withCount) {
+            $attributes['$count'] = 'true';
+        }
+
 
         if (count($this->select)) {
             $attributes['$select'] = implode(',', $this->select);
@@ -324,5 +348,14 @@ class Builder
         }
 
         return empty($param) ? $attributes : $attributes[$param] ?? null;
+    }
+
+    public function getQueryString(): string
+    {
+        return urldecode(http_build_query(
+            array_filter($this->getParams()),
+            '',
+            '',
+        ));
     }
 }
