@@ -2,11 +2,13 @@
 
 namespace Iamfredric\EduAdmin;
 
+use ArrayAccess;
 use ArrayIterator;
 use Iamfredric\EduAdmin\Resources\Resource;
 use Illuminate\Support\Collection;
+use IteratorAggregate;
 
-class ResourceCollection implements \IteratorAggregate, \ArrayAccess
+class ResourceCollection implements IteratorAggregate, ArrayAccess
 {
     protected Collection $resources;
 
@@ -28,7 +30,9 @@ class ResourceCollection implements \IteratorAggregate, \ArrayAccess
         protected string $order,
         protected string $resource
     ) {
-        $this->resources = (new Collection($resources))->mapInto($this->resource);
+        $this->resources = (new Collection($resources))->mapInto(
+            $this->resource
+        );
     }
 
     public function total(): int
@@ -38,8 +42,15 @@ class ResourceCollection implements \IteratorAggregate, \ArrayAccess
 
     public function next(): ResourceCollection
     {
-        return $this->resource::query()
-            ->when($this->orderBy, fn (Builder $query, $orderBy) => $query->orderBy($orderBy, $this->order))
+        return $this->resource
+            ::query()
+            ->when(
+                $this->orderBy,
+                fn(Builder $query, $orderBy) => $query->orderBy(
+                    $orderBy,
+                    $this->order
+                )
+            )
             ->skip($this->skip + $this->limit)
             ->limit($this->limit)
             ->get();
@@ -47,8 +58,15 @@ class ResourceCollection implements \IteratorAggregate, \ArrayAccess
 
     public function prev(): ResourceCollection
     {
-        return $this->resource::query()
-            ->when($this->orderBy, fn (Builder $query, $orderBy) => $query->orderBy($orderBy, $this->order))
+        return $this->resource
+            ::query()
+            ->when(
+                $this->orderBy,
+                fn(Builder $query, $orderBy) => $query->orderBy(
+                    $orderBy,
+                    $this->order
+                )
+            )
             ->skip($this->skip - $this->limit)
             ->limit($this->limit)
             ->get();
@@ -89,12 +107,19 @@ class ResourceCollection implements \IteratorAggregate, \ArrayAccess
         $this->resources->offsetUnset($offset);
     }
 
+    public function items(): Collection
+    {
+        return $this->resources;
+    }
+
     /**
      * @return array<string,mixed>
      */
     public function toArray(): array
     {
-        return $this->resources->map(fn (Resource $resource) => $resource->toArray())->toArray();
+        return $this->resources
+            ->map(fn(Resource $resource) => $resource->toArray())
+            ->toArray();
     }
 
     public function collect(): Collection

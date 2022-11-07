@@ -143,8 +143,11 @@ class Builder
         return $this;
     }
 
-    public function whereDate(string $field, string $compare, Carbon|string $value): static
-    {
+    public function whereDate(
+        string $field,
+        string $compare,
+        Carbon|string $value
+    ): static {
         $value = $value instanceof Carbon ? $value->toISOString() : $value;
 
         $compare = $this->compareTranslations[$compare] ?? $compare;

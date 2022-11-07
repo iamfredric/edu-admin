@@ -3,6 +3,7 @@
 namespace Iamfredric\EduAdmin\Resources;
 
 use Carbon\Carbon;
+use Iamfredric\EduAdmin\Builder;
 use Illuminate\Support\Collection;
 
 /**
@@ -41,8 +42,37 @@ class Booking extends WritableResource
         'Modified' => Carbon::class,
         'PostponedBillingDate' => Carbon::class,
         'CourseTemplate' => CourseTemplate::class,
-        'Participants.*' => Person::class,
+        'Participants.*' => Participant::class,
         'ContactPerson' => Person::class,
         'Customer' => Customer::class,
     ];
+
+    /**
+     * @param array<array<string, mixed>> $participants
+     * @return void
+     */
+    public function addParticipants(array $participants): void
+    {
+        $uri = implode('/', [
+            self::singularResourceName(),
+            $this->getKey(),
+            'Participants',
+        ]);
+        (new Builder($uri))->post([
+            'Options' => [
+                'IgnoreIfPersonAlreadyBooked' => true,
+                'ForceUsePostedPriceName' => false,
+            ],
+            'Participants' => $participants,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $participant
+     * @return void
+     */
+    public function addParticipant(array $participant): void
+    {
+        $this->addParticipants([$participant]);
+    }
 }

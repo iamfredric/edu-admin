@@ -24,7 +24,10 @@ abstract class Model implements ArrayAccess
      */
     final public function __construct(array|Collection $attributes)
     {
-        $this->attributes = $attributes instanceof Collection ? $attributes : new Collection($attributes);
+        $this->attributes =
+            $attributes instanceof Collection
+                ? $attributes
+                : new Collection($attributes);
     }
 
     public function getKey(): mixed
@@ -51,12 +54,15 @@ abstract class Model implements ArrayAccess
     public function getAttribute(string $name, mixed $default = null): mixed
     {
         if (isset($this->casts[$name])) {
-            return $this->casted[$name] ??= new $this->casts[$name]($this->attributes->get($name));
+            return $this->casted[$name] ??= new $this->casts[$name](
+                $this->attributes->get($name)
+            );
         }
 
         if (isset($this->casts["{$name}.*"])) {
-            return $this->casted[$name] ??= (new Collection($this->attributes->get($name)))
-                ->mapInto($this->casts["{$name}.*"]);
+            return $this->casted[$name] ??= (new Collection(
+                $this->attributes->get($name)
+            ))->mapInto($this->casts["{$name}.*"]);
         }
 
         return $this->attributes->get($name, $default);
