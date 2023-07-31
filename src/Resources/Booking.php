@@ -89,7 +89,7 @@ class Booking extends WritableResource
         ];
 
         return (new Builder($uri))->post([
-            'NamedUnnamedParticipants' => $participants
+            'NamedUnnamedParticipants' => $participants,
             'Options' => $options
         ]);
     }
