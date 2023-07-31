@@ -75,4 +75,22 @@ class Booking extends WritableResource
     {
         $this->addParticipants([$participant]);
     }
+
+    public function nameUnnamedParticipants(array $participants, array $options = [])
+    {
+        $uri = implode('/', [
+            self::singularResourceName(),
+            $this->getKey(),
+            'NameUnnamedParticipants',
+        ]);
+
+        $payload = [
+            'NamedUnnamedParticipants' => $participants
+        ];
+
+        return (new Builder($uri))->post([
+            'NamedUnnamedParticipants' => $participants
+            'Options' => $options
+        ]);
+    }
 }

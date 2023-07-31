@@ -25,7 +25,7 @@ class HttpClient implements HttpClientContract
     ): Collection {
         $response = Http::withHeaders($headers)->get($url, $params);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             $this->sendFailedResponse($response);
         }
 
@@ -53,7 +53,7 @@ class HttpClient implements HttpClientContract
             $response = Http::withHeaders($headers)->post($url, $params);
         }
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             $this->sendFailedResponse($response);
         }
 
@@ -73,7 +73,7 @@ class HttpClient implements HttpClientContract
     ): Collection {
         $response = Http::withHeaders($headers)->put($url, $params);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             $this->sendFailedResponse($response);
         }
 
@@ -93,7 +93,7 @@ class HttpClient implements HttpClientContract
     ): Collection {
         $response = Http::withHeaders($headers)->patch($url, $params);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             $this->sendFailedResponse($response);
         }
 
@@ -113,7 +113,7 @@ class HttpClient implements HttpClientContract
     ): Collection {
         $response = Http::withHeaders($headers)->delete($url, $params);
 
-        if (! $response->successful()) {
+        if (!$response->successful()) {
             $this->sendFailedResponse($response);
         }
 
@@ -123,7 +123,7 @@ class HttpClient implements HttpClientContract
     protected function sendFailedResponse(Response $response): void
     {
         $data = $response->collect();
-        
+
         match ($response->status()) {
             400 => throw new BadResponseException(
                 $data->get('title', 'Bad request'),
