@@ -72,7 +72,7 @@ class ResourceCollection implements IteratorAggregate, ArrayAccess
             ->get();
     }
 
-    public function first(): Resource
+    public function first(): ?Resource
     {
         return $this->resources->first();
     }

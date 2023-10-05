@@ -53,9 +53,14 @@ abstract class Model implements ArrayAccess
 
     public function getAttribute(string $name, mixed $default = null): mixed
     {
+
         if (isset($this->casts[$name])) {
+            if (! $value = $this->attributes->get($name, $default)) {
+                return $default;
+            }
+
             return $this->casted[$name] ??= new $this->casts[$name](
-                $this->attributes->get($name)
+                $value
             );
         }
 

@@ -76,7 +76,11 @@ class Booking extends WritableResource
         $this->addParticipants([$participant]);
     }
 
-    public function nameUnnamedParticipants(array $participants, array $options = [])
+    /**
+     * @param array<array<string, mixed>>$participants
+     * @param array{SkipDuplicateMatchOnPersons?: bool, IgnoreIfPersonAlreadyBooked?: bool, IgnoreMandatoryQuestions?: bool} $options
+     */
+    public function nameUnnamedParticipants(array $participants, array $options = []): Collection
     {
         $uri = implode('/', [
             self::singularResourceName(),
