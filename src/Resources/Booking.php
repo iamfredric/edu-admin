@@ -78,7 +78,11 @@ class Booking extends WritableResource
 
     /**
      * @param array<array<string, mixed>>$participants
-     * @param array{SkipDuplicateMatchOnPersons?: bool, IgnoreIfPersonAlreadyBooked?: bool, IgnoreMandatoryQuestions?: bool} $options
+     * @param array{
+     *  SkipDuplicateMatchOnPersons?: bool,
+     *  IgnoreIfPersonAlreadyBooked?: bool,
+     *  IgnoreMandatoryQuestions?: bool
+     * } $options
      */
     public function nameUnnamedParticipants(array $participants, array $options = []): Collection
     {
