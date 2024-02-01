@@ -152,3 +152,60 @@ it('can filter relationship', function () {
     expect($builder->getParams('$expand'))
         ->toBe("Events(\$filter=CustomerId Eq null)");
 });
+
+it('can filter where has on a relationship', function () {
+    $builder = new Builder('test');
+
+    $builder->whereHas('Events', function ($query) {
+        $query->where('CustomerId', '=', 1);
+    });
+
+    expect($builder->getParams('$filter'))
+        ->toBe("Events/any(d:d/CustomerId Eq 1)");
+});
+
+it('can filter where has on a relationship without a callable', function () {
+    $builder = new Builder('test');
+
+    $builder->whereHas('Events');
+
+    expect($builder->getParams('$filter'))
+        ->toBe("Events/any");
+});
+
+it('can load related data with keyed callable', function () {
+    $oldBuilder = new Builder('test');
+
+    $oldBuilder->where('CategoryId', '=', 123) // Todo
+        ->select('One', 'Two', 'Three')
+        ->with(function (Builder $query) {
+            $query->where('Thing', '=', 'hi');
+
+            return 'Events';
+        });
+
+    $builder = new Builder('test');
+
+    $builder->where('CategoryId', '=', 123) // Todo
+        ->select('One', 'Two', 'Three')
+        ->with(['Events' => function (Builder $query) {
+            $query->where('Thing', '=', 'hi');
+        }]);
+
+    expect($builder->getQueryString())
+        ->toBe('$count=true$select=One,Two,Three$filter=CategoryId Eq 123$expand=Events($filter=Thing Eq \'hi\')');
+
+    expect($oldBuilder->getQueryString())->toBe($builder->getQueryString());
+});
+
+it('can load related data from a relation', function () {
+    $builder = new Builder('test');
+    $builder->with(['Events' => function (Builder $query) {
+        $query
+            ->where('thing', 'ahoy')
+            ->select('Ahoy', 'Matey');
+    }]);
+
+    expect($builder->getQueryString())
+        ->toBe('$count=true$expand=Events($select=Ahoy,Matey;$filter=thing Eq \'ahoy\')');
+});

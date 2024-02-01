@@ -172,6 +172,20 @@ class Builder
         return $this;
     }
 
+    public function whereHas(string $field, ?callable $callable = null)
+    {
+        if ($callable) {
+            $callable($builder = new Builder($this->uri, $this->resource));
+
+            $query = $builder->getParams('$filter');
+            $this->where[] = "{$field}/any(d:d/{$query})";
+        } else {
+            $this->where[] = "{$field}/any";
+        }
+
+        return $this;
+    }
+
     protected function groupWhere(callable $callable): static
     {
         $callable($builder = new Builder($this->uri, $this->resource));
@@ -214,16 +228,26 @@ class Builder
     }
 
     /**
-     * @param string|callable ...$relations
+     * @param array<string, callable>|string|callable ...$relations
      * @return $this
      */
     public function with(...$relations): static
     {
         $relations = array_map(function ($relation) {
-            if (is_callable($relation)) {
+            if (is_array($relation)) {
+                $temporaryRelations = [];
+
+                foreach ($relation as $name => $callable) {
+                    $callable($builder = new Builder($this->uri, $this->resource, false));
+
+                    $temporaryRelations[] = "{$name}({$builder->getQueryString(';')})";
+                }
+
+                $relation = implode(',', $temporaryRelations);
+            } elseif (is_callable($relation)) {
                 $e = $relation($builder = new Builder($this->uri, $this->resource, false));
-                
-                $relation = "{$e}({$builder->getQueryString()})";
+
+                $relation = "{$e}({$builder->getQueryString(';')})";
             } else {
                 if (str_contains($relation, '.')) {
                     $value = '';
@@ -350,12 +374,12 @@ class Builder
         return empty($param) ? $attributes : $attributes[$param] ?? null;
     }
 
-    public function getQueryString(): string
+    public function getQueryString(string $separator = ''): string
     {
         return urldecode(http_build_query(
             array_filter($this->getParams()),
             '',
-            '',
+            $separator
         ));
     }
 }
