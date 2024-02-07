@@ -59,6 +59,8 @@ use Iamfredric\EduAdmin\Resources\Models\EventDate;
  * @property-read array|null $Bookings
  * @property-read object|null $ResponsibleUser
  * @property-read array|null $Categories
+ * @property-read LocationAddress|null $LocationAddress
+ * @property-read array<PriceName>|null $PriceNames
  */
 class Event extends Resource
 {
@@ -67,6 +69,8 @@ class Event extends Resource
         'EndDate' => Carbon::class,
         'LastApplicationDate' => Carbon::class,
         'EventDates.*' => EventDate::class,
-        'Personnel.*' => Personnel::class
+        'Personnel.*' => Personnel::class,
+        'LocationAddress' => LocationAddress::class,
+        'PriceNames.*' => PriceName::class,
     ];
 }

@@ -20,9 +20,9 @@ abstract class Model implements ArrayAccess
     protected array $casted = [];
 
     /**
-     * @param Collection<string,mixed>|array<string,mixed> $attributes
+     * @param Collection<string,mixed>|array<string,mixed>|null $attributes
      */
-    final public function __construct(array|Collection $attributes)
+    final public function __construct(array|Collection|null $attributes)
     {
         $this->attributes =
             $attributes instanceof Collection

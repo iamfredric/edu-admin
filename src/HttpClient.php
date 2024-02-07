@@ -126,7 +126,7 @@ class HttpClient implements HttpClientContract
 
         match ($response->status()) {
             400 => throw new BadResponseException(
-                $data->get('title', 'Bad request'),
+                $response->body() ?: $data->get('title', 'Bad request'),
                 $data->toArray(),
                 400
             ),
