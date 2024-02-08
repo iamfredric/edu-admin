@@ -26,6 +26,7 @@ abstract class Resource extends Model
         );
     }
 
+    /** @return Builder<static> */
     public static function query(): Builder
     {
         return new Builder('odata/' . static::resourceName(), static::class);
@@ -54,7 +55,7 @@ abstract class Resource extends Model
     /**
      * @param string $name
      * @param array<mixed> $arguments
-     * @return Builder
+     * @return Builder<static>
      */
     public static function __callStatic(string $name, array $arguments): Builder
     {

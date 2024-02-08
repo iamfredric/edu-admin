@@ -18,7 +18,6 @@ use Iamfredric\EduAdmin\Resources\Models\EventDate;
  * @property-read bool $ShowOnWebInternal
  * @property-read string|null $Notes
  * @property-read int|null $LocationId
- * @property-read int|null $LocationAddressId
  * @property-read string|null $City
  * @property-read Carbon $StartDate
  * @property-read Carbon $EndDate
@@ -32,8 +31,8 @@ use Iamfredric\EduAdmin\Resources\Models\EventDate;
  * @property-read bool $ConfirmedAddress
  * @property-read int|null $CustomerId
  * @property-read bool $UsePriceNameMaxParticipantNumber
- * @property-read string|null $ApplicationOpenDate
- * @property-read string $LastApplicationDate
+ * @property-read Carbon|null $ApplicationOpenDate
+ * @property-read Carbon|null $LastApplicationDate
  * @property-read bool $CompanySpecific
  * @property-read bool $AllowOverlappingSessions
  * @property-read bool $HasPublicPriceName
@@ -48,8 +47,6 @@ use Iamfredric\EduAdmin\Resources\Models\EventDate;
  * @property-read bool $OnDemand
  * @property-read bool $OnDemandPublished
  * @property-read array|null $Personnel
- * @property-read object $LocationAddress
- * @property-read array|null $PriceNames
  * @property-read array|null $Sessions
  * @property-read array|null $EventDates
  * @property-read array|null $Accessories
@@ -68,6 +65,7 @@ class Event extends Resource
         'StartDate' => Carbon::class,
         'EndDate' => Carbon::class,
         'LastApplicationDate' => Carbon::class,
+        'ApplicationOpenDate' => Carbon::class,
         'EventDates.*' => EventDate::class,
         'Personnel.*' => Personnel::class,
         'LocationAddress' => LocationAddress::class,

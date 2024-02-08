@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Iamfredric\EduAdmin\Resources\Resource;
 use Illuminate\Support\Collection;
 
+/** @template T of Resource */
 class Builder
 {
     /**
@@ -46,10 +47,7 @@ class Builder
      */
     protected array $relations = [];
 
-    /**
-     * @param string $uri
-     * @param class-string<Resource>|null $resource
-     */
+    /** @param class-string<T>|null $resource */
     public function __construct(
         protected string $uri,
         protected ?string $resource = null,
@@ -93,7 +91,7 @@ class Builder
             return $this->whereNotIn($field, $value);
         }
 
-        if (empty($value)) {
+        if (is_null($value)) {
             $value = $compare;
             $compare = '=';
         }
@@ -322,6 +320,7 @@ class Builder
         return (new Client())->get($this->uri, $this->getParams());
     }
 
+    /** @return T|null */
     public function find(int $id): ?Resource
     {
         $this->uri = implode('/', [$this->uri, $id]);
