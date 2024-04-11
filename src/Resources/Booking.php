@@ -67,6 +67,73 @@ class Booking extends WritableResource
         ]);
     }
 
+    public function addUnnamedParticipants(int|array $attributes): void
+    {
+        $uri = implode('/', [
+            self::singularResourceName(),
+            $this->getKey(),
+            'UnnamedParticipants',
+        ]);
+
+        if (! is_array($attributes)) {
+            $attributes = [[
+                'Quantity' => $attributes,
+            ]];
+        }
+
+        (new Builder($uri))->post($attributes);
+    }
+
+    /**
+     * @param Collection<Person>|Person $persons
+     * @param array{
+     *  SkipDuplicateMatchOnPersons?: bool,
+     *  IgnoreIfPersonAlreadyBooked?: bool,
+     *  IgnoreMandatoryQuestions?: bool
+     * } $options
+     */
+    public function nameUnnamedParticipants(
+        Collection|Person $persons,
+        array $options = [
+            'SkipDuplicateMatchOnPersons' => true,
+            'IgnoreIfPersonAlreadyBooked' => true,
+            'IgnoreMandatoryQuestions' => true,
+        ]
+    ): void {
+        $uri = implode('/', [
+            self::singularResourceName(),
+            $this->getKey(),
+            'NameUnnamedParticipants',
+        ]);
+
+        if (! $persons instanceof Collection) {
+            $persons = new Collection($persons);
+        }
+
+        (new Builder($uri))->post([
+            'Options' => $options,
+            'NamedUnnamedParticipants' => $persons->map(fn (Person $person) => [
+                'PriceNameId' => '',
+                'PersonId' => $person->getKey(),
+                'FirstName' => $person->FirstName,
+                'LastName' => $person->LastName,
+                'Address' => $person->Address,
+                'Address2' => $person->Address2,
+                'Zip' => $person->Zip,
+                'City' => $person->City,
+                'Mobile' => $person->Mobile,
+                'Email' => $person->Email,
+                'CivicRegistrationNumber' => $person->CivicRegistrationNumber,
+                'Birthdate' => $person->Birthdate,
+                'EmployeeNumber' => $person->EmployeeNumber,
+                'JobTitle' => $person->JobTitle,
+                'Country' => $person->Country,
+                'CountryCode' => $person->CountryCode,
+                'SsoId' => $person->SsoId,
+            ])->toArray()
+        ]);
+    }
+
     /**
      * @param array<string, mixed> $participant
      * @return void
@@ -74,31 +141,5 @@ class Booking extends WritableResource
     public function addParticipant(array $participant): void
     {
         $this->addParticipants([$participant]);
-    }
-
-    /**
-     * @param array<array<string, mixed>>$participants
-     * @param array{
-     *  SkipDuplicateMatchOnPersons?: bool,
-     *  IgnoreIfPersonAlreadyBooked?: bool,
-     *  IgnoreMandatoryQuestions?: bool
-     * } $options
-     */
-    public function nameUnnamedParticipants(array $participants, array $options = []): Collection
-    {
-        $uri = implode('/', [
-            self::singularResourceName(),
-            $this->getKey(),
-            'NameUnnamedParticipants',
-        ]);
-
-        $payload = [
-            'NamedUnnamedParticipants' => $participants
-        ];
-
-        return (new Builder($uri))->post([
-            'NamedUnnamedParticipants' => $participants,
-            'Options' => $options
-        ]);
     }
 }
