@@ -28,8 +28,8 @@ use Illuminate\Support\Collection;
  * @property int|null $ProgrammeBookingId
  * @property Customer $Customer
  * @property Person $ContactPerson
- * @property Collection<Person>|null $Participants
- * @property array|null $UnnamedParticipants
+ * @property Collection<Participant>|null $Participants
+ * @property Collection<UnnamedParticipant>|null $UnnamedParticipants
  * @property array|null $Accessories
  * @property array|null $Answers
  * @property array|null $OrderRows
@@ -43,6 +43,7 @@ class Booking extends WritableResource
         'PostponedBillingDate' => Carbon::class,
         'CourseTemplate' => CourseTemplate::class,
         'Participants.*' => Participant::class,
+        'UnnamedParticipants.*' => UnnamedParticipant::class,
         'ContactPerson' => Person::class,
         'Customer' => Customer::class,
     ];
@@ -94,6 +95,7 @@ class Booking extends WritableResource
      */
     public function nameUnnamedParticipants(
         Collection|Person $persons,
+        int $priceNameId,
         array $options = [
             'SkipDuplicateMatchOnPersons' => true,
             'IgnoreIfPersonAlreadyBooked' => true,
@@ -107,13 +109,13 @@ class Booking extends WritableResource
         ]);
 
         if (! $persons instanceof Collection) {
-            $persons = new Collection($persons);
+            $persons = new Collection([$persons]);
         }
 
         (new Builder($uri))->post([
             'Options' => $options,
             'NamedUnnamedParticipants' => $persons->map(fn (Person $person) => [
-                'PriceNameId' => '',
+                'PriceNameId' => $priceNameId,
                 'PersonId' => $person->getKey(),
                 'FirstName' => $person->FirstName,
                 'LastName' => $person->LastName,
